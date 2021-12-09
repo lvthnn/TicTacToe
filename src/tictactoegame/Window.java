@@ -8,12 +8,27 @@ import java.util.ArrayList;
 
 public class Window extends JFrame {
 
+    //**************************************************
+    //  FIELDS
+    //**************************************************
+
     private static final long serialVersionUID = 1L;
 
     int gameWidth;
-    int gameHeight; // Set aspect ratio to 16:9
+    int gameHeight;
 
     public JFrame gameScreen;
+
+    //**************************************************
+    //  CONSTRUCTORS
+    //**************************************************
+
+    /**
+    * Window class constructor
+    *
+    * @param width Width of game window
+
+    */
 
     public Window(int width) {
         gameScreen = new JFrame();
@@ -24,9 +39,20 @@ public class Window extends JFrame {
         System.out.println("Calculated height: " + this.gameHeight);
     }
 
+    //**************************************************
+    //  METHODS
+    //**************************************************
+
+    /**
+     * Displays initial game state.
+     * 
+     * @param tiles ArrayList<Tile> containing tiles with their data
+     */
+
+
     public void displayScreen(ArrayList<Tile> tiles) {
         // INITIALIZE VARIABLES: 
-        Dimension prefGameDimension = new Dimension(this.gameWidth, this.gameHeight);
+        Dimension d = new Dimension(this.gameWidth, this.gameHeight);
         gameScreen = new JFrame(Game.gameTitle);
 
         // ADD TILES TO JFRAME:
@@ -37,14 +63,13 @@ public class Window extends JFrame {
         // GAME SCREEN OPTIONS:
         gameScreen.setLayout(new GridLayout(3,3));
         gameScreen.setResizable(false);
-        gameScreen.setPreferredSize(prefGameDimension);
-        gameScreen.setMinimumSize(prefGameDimension);
-        gameScreen.setMaximumSize(prefGameDimension);
+        gameScreen.setPreferredSize(d);
+        gameScreen.setMinimumSize(d);
+        gameScreen.setMaximumSize(d);
         gameScreen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameScreen.setLocationRelativeTo(null);
         gameScreen.setVisible(true);
         gameScreen.pack();
     }
 
-    
 }

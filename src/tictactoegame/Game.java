@@ -10,59 +10,101 @@ import java.lang.IndexOutOfBoundsException;
 
 public class Game implements ActionListener {
 
-    // EDITION 1.00
+    //**************************************************
+    //  FIELDS
+    //**************************************************
 
-    // Application instance fields
-    public static int runMode;
+    public static int runMode;  // Not implemented
     public static String gameTitle, gameAuthor;
     public static Window gameWindow;
     public static Game TicTacToeGame;
 
-
     public static ArrayList<Tile> gameTiles = new ArrayList<Tile>();
     public static ArrayList<JButton> buttonIndex = new ArrayList<JButton>();
     
-    private ArrayList<Tile> playerOneSelectedTiles = new ArrayList<Tile>();
-    private ArrayList<Tile> playerTwoSelectedTiles = new ArrayList<Tile>();
+    private ArrayList<Tile> playerOneSelectedTiles = new ArrayList<Tile>(); // P1 selectionPool
+    private ArrayList<Tile> playerTwoSelectedTiles = new ArrayList<Tile>(); // P2 selectionPool
 
-    // Private fields
-    private boolean secondPlayerTurn;
-    private char markSymbol;
-    private Color gameTextColor;
+    private boolean secondPlayerTurn;           // Informs us which player's turn it is
+    private char markSymbol;                    // Mark symbol of players in playing board: X or O?
+    private Color gameTextColor;                // Foreground color of tiles
 
-    // Game instance fields:
     public String[] playerIDs = new String[2];
 
+    //**************************************************
+    //  CONSTRUCTORS
+    //**************************************************
+
+    /**
+    * Game class constructor
+    *
+    * @param window The window object (see Window.java) that is responsible for rendering game UI
+    * @param title The window title
+    * @param author Game author
+    */
+    
     public Game(Window window, String title, String author) {
         Game.gameTitle = title;
         Game.gameWindow = window;
         Game.gameAuthor = author;
+      
     }
-     public static void main(String[] args) {
+
+    //**************************************************
+    //  METHODS
+    //**************************************************
+
+    public static void main(String[] args) {
         gameWindow = new Window(800);
         TicTacToeGame = new Game(gameWindow, "TIC TAC TOE", "Kári Hlynsson");
         TicTacToeGame.startGame(gameWindow);
     }
 
-    public void startGame(Window windowToRun) {
+    /**
+     * Starts a new game session.
+     * 
+     * @param window The instantiated window object for respective Game class
+     */
+
+    public void startGame(Window window) {
+  
         for(int i = 0; i <= 8; i++) {
             int instance = i;
             String nameOfTile = getInstanceHandle(i);
             gameTiles.add(new Tile(instance, nameOfTile, new JButton(), ' '));
-            // System.out.println("Generated new Tile object with parameters: \n" +
-            //                    "tileNumber: " + instance + "\n" +
-            //                    "tileName: " + nameOfTile);
         }
+
         for(Tile tile : gameTiles) {
             (tile.tileInterface).addActionListener(this);
             buttonIndex.add(tile.tileInterface);
         }
-        windowToRun.displayScreen(gameTiles);
+
+        window.displayScreen(gameTiles);
+
     }
+
+    /**
+     * Returns string representation of tile in playing board
+     * 
+     * @param num Number of tile in playing board (left->right, top->bottom),
+     * i.e.
+     *                      ____________
+     *                     | 1 | 2 | 3 |
+     *                     | 4 | 5 | 6 |
+     *                     |_7_|_8_|_9_|
+     *  
+     * @return String representation tile X in the format 'TileNumX'.
+     */
 
     public String getInstanceHandle(int num) {
         return "TileNum".concat(Integer.toString(num));
     }
+
+    /**
+     *  Adds symbol to tile once mouseclick has been registered
+     * 
+     *  @param event ActionEvent resulting from player mouseclick
+     */
 
     public void actionPerformed(ActionEvent event) {
         int buttonPressedNum = buttonIndex.indexOf(event.getSource());
@@ -77,13 +119,7 @@ public class Game implements ActionListener {
             markSymbol = 'O';
         }
 
-
-        (gameTiles.get(buttonPressedNum)).updateTile(markSymbol, gameTextColor, TicTacToeGame);
-
-        System.out.println("\n-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\nVALUE OF ALL TILES IN BOARD:");
-        for(Tile tile : gameTiles) {
-            System.out.println(tile.tileName + ": " + tile.tileValue);
-        }
+        gameTiles.get(buttonPressedNum).updateTile(markSymbol, gameTextColor, TicTacToeGame);
 
         if(!secondPlayerTurn) {
             playerOneSelectedTiles.add(gameTiles.get(buttonPressedNum));
@@ -93,6 +129,14 @@ public class Game implements ActionListener {
             checkSelections(playerTwoSelectedTiles);
         }
     }
+
+    /**
+     *  Checks whether any combination of respective user tile selections match victory criteria.
+     * 
+     *  @param selectionPool An arraylist of Tile objects which have been selected by each player.
+     *  Note that selectionPool is NOT an arraylist with all selected tiles, only the tiles selected
+     *  by one of the players.
+     */
 
     public void checkSelections(ArrayList<Tile> selectionPool) {
         ArrayList<Integer> matchingCases = new ArrayList<Integer>(Arrays.asList(1,3,4,5,7));
@@ -112,8 +156,6 @@ public class Game implements ActionListener {
                     numChecks = 0;
                 }
                 
-                System.out.println("\nCHECKING TILE " + currentTile.tileNumber);
-
                 for(int i = 0; i <= numChecks; i++) {
                     switch(i) {
                         case 0:
@@ -130,18 +172,13 @@ public class Game implements ActionListener {
                             break;
                     }
 
-                    System.out.println("\n   VALUE OF CHECKED TILES (check mode" + i + "): ");
-                    System.out.println("   " + currentTile.tileName + " (current): " + currentTile.tileValue);
-                    System.out.println("   " + gameTiles.get(currentTile.tileNumber + tileDistance).tileName + ": " + gameTiles.get(currentTile.tileNumber + tileDistance).tileValue);
-                    System.out.println("   " + gameTiles.get(currentTile.tileNumber - tileDistance).tileName + ": " + gameTiles.get(currentTile.tileNumber - tileDistance).tileValue);    
-
                     try {
                         if(
                             currentTile.tileValue == gameTiles.get(currentTile.tileNumber + tileDistance).tileValue
                         &&  currentTile.tileValue == gameTiles.get(currentTile.tileNumber - tileDistance).tileValue
                         ) {
-                            System.out.println("Victory!");
-                            TicTacToeGame.playerVictory();
+                            int winningPlayer = TicTacToeGame.playerVictory();
+                            System.out.println("Player " + winningPlayer + " victory!");
                         }
                     } catch(IndexOutOfBoundsException e) {
 
@@ -151,15 +188,19 @@ public class Game implements ActionListener {
         } 
     }
 
-    public void playerVictory() {
+    /*
+     * How to proceed once one of the players' selection pools matches victory conditions.
+     */
+
+    public int playerVictory() {
         int winningPlayer;
-        if(secondPlayerTurn) {
-            winningPlayer = 1;
-        } else {
-            winningPlayer = 2;
-        }
+        if(secondPlayerTurn) { winningPlayer = 1; } 
+        else { winningPlayer = 2; }
+
         for(Tile gameTile : gameTiles) {
             gameTile.updateTileVictory(winningPlayer, gameTile.tileInterface);
         }
+
+        return winningPlayer;
     }
 }
